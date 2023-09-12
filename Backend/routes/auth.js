@@ -33,9 +33,11 @@ router.post(
     }
     try {
       // check wheather the user with this email is already exist
-      let user = await User.findOne({ email:req.body.email });
+      let user = await User.findOne({ email: req.body.email });
       if (user) {
-        return res.status(400).json({ error: "Sorry a user with this email id already exist" });
+        return res
+          .status(400)
+          .json({ error: "Sorry a user with this email id already exist" });
       }
 
       const salt = await bcrypt.genSalt(10);
@@ -112,10 +114,8 @@ router.post(
 //Route:3 Get loggedin User details using:/ POST "/api/auth/getuser" .login required
 router.post("/getuser", fetchuser, async (req, res) => {
   try {
-     const userId = req.user.id;
-     console.log(userId);
+    const userId = req.user.id;
     const user = await User.findById(userId).select("-password");
-    console.log(user);
     res.send(user);
   } catch (error) {
     console.error(error.message);

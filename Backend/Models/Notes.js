@@ -1,23 +1,28 @@
-import mongoose from 'mongoose';
+const mongoose = require('mongoose')
 const { Schema } = mongoose;
 
 const NoteSchema = new Schema({
- title:{
-    type:string,
-    required:true
- },
- description:{
-    type:string,
-    required:true,
- },
- tag:{
-    type:string,
-    default:"General"
- },
- date:{
-    type:Date,
-    default:date.now
- }
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "users",
+  },
+  title: {
+    type: String,
+    required: true,
+  },
+  description: {
+    type: String,
+    required: true,
+  },
+  tag: {
+    type: String,
+    default: "General",
+  },
+  date: {
+    type: Date,
+    default: Date.now,
+  },
 });
 
-module.exports = mongoose.model('notes',NoteSchema)
+const Notes = mongoose.model('notes',NoteSchema);
+module.exports = Notes;
