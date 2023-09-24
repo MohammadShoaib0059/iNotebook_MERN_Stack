@@ -21,6 +21,7 @@ router.post(
     }),
   ],
   async (req, res) => {
+    let success = false;
     // console.log(req.body);
     // const user = User(req.body);
     // user.save();
@@ -29,15 +30,16 @@ router.post(
     // if there are errors, return Bad request and the errors
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+      return res.status(400).json({success, errors: errors.array() });
     }
     try {
       // check wheather the user with this email is already exist
       let user = await User.findOne({ email: req.body.email });
       if (user) {
+        success = false;
         return res
           .status(400)
-          .json({ error: "Sorry a user with this email id already exist" });
+          .json({ success,error: "Sorry a user with this email id already exist" });
       }
 
       const salt = await bcrypt.genSalt(10);
@@ -54,12 +56,13 @@ router.post(
           id: user.id,
         },
       };
-      const Authtoken = jwt.sign({ data }, JWT_SECRET);
-      res.json({ Authtoken });
+      const Authtoken = jwt.sign( data , JWT_SECRET);
+      success = true;
+      res.json({success, Authtoken });
       //catch a error
     } catch (error) {
       console.error(error.message);
-      res.status(500).send("Internal server error");
+      res.status(500).send(error.message,"Internal server error");
     }
   }
 );
@@ -74,6 +77,7 @@ router.post(
   ],
   async (req, res) => {
     // if there are errors, return Bad request and the errors
+    let success = false;
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
@@ -85,6 +89,7 @@ router.post(
       // finding email from database
       let user = await User.findOne({ email });
       if (!user) {
+        success =false;
         return res
           .status(400)
           .json({ error: "Please try to login with correct credentials" });
@@ -92,9 +97,10 @@ router.post(
       // compairing database password for perticular email with current password
       const passwordCompare = await bcrypt.compare(password, user.password);
       if (!passwordCompare) {
+        success =false;
         return res
           .status(400)
-          .json({ error: "Please try to login with correct credentials" });
+          .json({ success, error: "Please try to login with correct credentials" });
       }
       // sending the user perticular id token
       const data = {
@@ -103,10 +109,11 @@ router.post(
         },
       };
       const Authtoken = jwt.sign({ data }, JWT_SECRET);
-      res.json({ Authtoken });
+      success = true;
+      res.json({success, Authtoken });
     } catch (error) {
       console.error(error.message);
-      res.status(500).send("Internal server error");
+      res.status(500).send(error.message,"Internal server error");
     }
   }
 );
@@ -119,7 +126,7 @@ router.post("/getuser", fetchuser, async (req, res) => {
     res.send(user);
   } catch (error) {
     console.error(error.message);
-    res.status(500).send("Internal server error");
+    res.status(500).send(error.message,"Internal server error");
   }
 });
 module.exports = router;

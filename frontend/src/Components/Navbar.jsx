@@ -1,15 +1,14 @@
 import { useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 
 function NavScrollExample() {
   let location = useLocation();
-
-  useEffect(() => {
-    // Google Analytics
-  
-    console.log(location.pathname);
-  }, [location]);
+  let navigate =useNavigate();
+  const handleLogout =()=>{
+    localStorage.removeItem("token")
+    navigate("/login")
+  }
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
   <div className="container-fluid">
@@ -44,6 +43,16 @@ function NavScrollExample() {
         <input className="form-control me-2" type="search" placeholder="Search" aria-label="Search"/>
         <button className="btn btn-outline-success" type="submit">Search</button>
       </form>
+     {
+      localStorage.getItem("token") ? <button onClick={handleLogout} className="btn btn-primary mx-2">Logout</button> :  <ul className="navbar-nav">
+      <li className="nav-item">
+          <Link className={`nav-link ${location.pathname === "/login" ? "active" :""}`}  to="/login">Login</Link>
+        </li>
+        <li className="nav-item">
+          <Link className={`nav-link ${location.pathname === "/signup" ? "active" :""}`}  to="/signup">Signup</Link>
+        </li>
+      </ul>
+     }
     </div>
   </div>
 </nav>
